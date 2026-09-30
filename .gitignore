@@ -1,0 +1,9 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# VS Code settings (personal, not needed on GitHub)
+.vscode/
+
+# Logs
+*.log

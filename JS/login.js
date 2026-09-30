@@ -1,10 +1,10 @@
 /* ============================================================
    LOGIN PAGE
-   Handles the login/register form on login.html only.
-   On success, redirects to index.html (the actual game).
+   Handles the login/register form on login.html.
+   On success, redirects to index.html.
    ============================================================ */
 
-/* If the user is already logged in, skip straight to the game */
+/* Already logged in? Skip to the game */
 window.addEventListener("DOMContentLoaded", () => {
   if (Auth.isLoggedIn()) {
     window.location.href = "index.html";
@@ -24,24 +24,21 @@ document.getElementById("show-login").addEventListener("click", () => {
   document.getElementById("login-error").textContent = "";
 });
 
-/* Log in — on success, go to the game */
+/* Log in */
 document.getElementById("login-btn").addEventListener("click", async () => {
   const username = document.getElementById("login-username").value;
   const password = document.getElementById("login-password").value;
   const errorEl = document.getElementById("login-error");
 
   const result = await Auth.login(username, password);
-
   if (!result.success) {
     errorEl.textContent = result.message;
     return;
   }
-
-  // Success — send them to the main game page
   window.location.href = "index.html";
 });
 
-/* Register — on success, switch to login form with username prefilled */
+/* Register */
 document.getElementById("register-btn").addEventListener("click", async () => {
   const username = document.getElementById("register-username").value;
   const password = document.getElementById("register-password").value;
@@ -49,19 +46,15 @@ document.getElementById("register-btn").addEventListener("click", async () => {
   const errorEl = document.getElementById("register-error");
 
   const result = await Auth.register(username, password, confirm);
-
   if (!result.success) {
     errorEl.textContent = result.message;
     return;
   }
 
-  // Clear register fields
-  errorEl.textContent = "";
+  /* Clear fields, prefill login username, switch forms */
   document.getElementById("register-username").value = "";
   document.getElementById("register-password").value = "";
   document.getElementById("register-confirm").value = "";
-
-  // Prefill login form and switch to it
   document.getElementById("login-username").value = username;
   document.getElementById("show-login").click();
   document.getElementById("login-error").textContent = "Account created. Please log in.";
