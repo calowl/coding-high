@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coding High</title>
+
+  <!-- Linking the stylesheet first so the page doesn't flash unstyled while scripts load -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- JetBrains Mono — a monospace font that fits the coding theme.
+       Loaded from Google Fonts so I don't have to host it myself. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+
+  <!--============================================================
+       MAIN MENU
+       Where the player lands after logging in. Three options:
+       start a run, look at scores, or log out.
+       ============================================================ -->
+  <section id="screen-menu" class="screen active">
+    <div class="menu-container">
+
+      <h1 class="game-title">Coding&nbsp;High</h1>
+      <p id="welcome-msg" class="welcome">Welcome back, player.</p>
+
+      <div class="menu-buttons">
+        <button id="start-game-btn" class="btn-primary">Start Game</button>
+        <button id="view-leaderboard-btn" class="btn-secondary">Leaderboard</button>
+        <button id="logout-btn" class="btn-danger">Log Out</button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       GAME SCREEN
+       Three-column layout:
+         LEFT   = character panel, coloured per language
+         MIDDLE = dialogue + question + answer buttons
+         RIGHT  = vertical love meter
+
+       CSS grid keeps the middle column flexible while the side
+       columns stay fixed. On mobile everything stacks vertically.
+       ============================================================ -->
+  <section id="screen-game" class="screen">
+    <div class="game-container">
+
+      <!-- Small HUD at the top — just score and lives. -->
+      <header class="game-hud">
+        <div class="hud-item">
+          <span class="hud-label">Score</span>
+          <span id="score-display" class="hud-value">0</span>
+        </div>
+
+        <div class="hud-item hud-right">
+          <span class="hud-label">Lives</span>
+          <div id="lives-display" class="lives"></div>
+        </div>
+      </header>
+
+      <!-- THREE-COLUMN GRID -->
+      <div class="game-area">
+
+        <!-- LEFT COLUMN — character panel.
+             Background colour comes from data.js via a CSS variable
+             (--char-color). Portrait swaps when the character changes. -->
+        <aside class="character-panel">
+          <p id="character-name" class="character-panel-label">Character</p>
+          <div class="character-avatar">
+            <img id="character-image" src="" alt="Character portrait" />
+          </div>
+        </aside>
+
+        <!-- MIDDLE COLUMN — dialogue + question + answers -->
+        <main class="quiz-area">
+
+          <div class="dialogue-box">
+            <p id="character-dialogue" class="dialogue">...</p>
+            <p id="question-text" class="question"></p>
+          </div>
+
+          <div class="quiz-box">
+            <p class="quiz-box-label">quiz box</p>
+            <div id="answers-container" class="answers"></div>
+            <p id="feedback-msg" class="feedback" aria-live="polite"></p>
+          </div>
+
+        </main>
+
+        <!-- RIGHT COLUMN — vertical love meter.
+             Fills from the bottom up as the player answers correctly.
+             Resets when they get one wrong. -->
+        <aside class="love-panel">
+          <p class="love-label">love meter</p>
+          <div class="love-meter-vertical">
+            <div id="love-fill" class="love-fill-vertical"></div>
+          </div>
+          <p id="love-multiplier" class="love-multiplier">1.00x</p>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       LEADERBOARD
+       Top 10 scores. Table body is empty — JS fills it in from
+       localStorage when this screen is shown.
+       ============================================================ -->
+  <section id="screen-leaderboard" class="screen">
+    <div class="leaderboard-container">
+
+      <h1>Leaderboard</h1>
+      <p class="subtitle">Top 10 scores of all time</p>
+
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Score</th>
+            <th>Correct</th>
+            <th>Love</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+
+      <p id="leaderboard-empty" class="empty-msg hidden">
+        No scores yet. Be the first to play!
+      </p>
+
+      <button id="back-to-menu-btn" class="btn-secondary">Back to Menu</button>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CRASH SCREEN
+       Game over when the player loses all 3 lives.
+       ============================================================ -->
+  <section id="screen-crash" class="screen">
+    <div class="end-container">
+      <h1 class="crash-title">Fatal Error</h1>
+      <p class="crash-sub">Segmentation fault. Core dumped.</p>
+
+      <div class="end-stats">
+        <p>Final Score: <span id="crash-score">0</span></p>
+        <p>Correct Answers: <span id="crash-correct">0</span></p>
+        <p>Max Love Multiplier: <span id="crash-multiplier">1.0x</span></p>
+      </div>
+
+      <div class="end-buttons">
+        <button id="crash-retry-btn" class="btn-primary">Try Again</button>
+        <button id="crash-menu-btn" class="btn-secondary">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       VICTORY SCREEN
+       Shown when the player finishes all three characters
+       without losing three lives. Romance line at the bottom
+       changes based on how they did.
+       ============================================================ -->
+  <section id="screen-victory" class="screen">
+    <div class="end-container">
+      <h1 class="victory-title">Compiled Successfully</h1>
+      <p class="victory-sub">You survived all three languages.</p>
+
+      <div class="end-stats">
+        <p>Final Score: <span id="victory-score">0</span></p>
+        <p>Correct Answers: <span id="victory-correct">0</span></p>
+        <p>Wrong Answers: <span id="victory-wrong">0</span></p>
+        <p>Max Love Multiplier: <span id="victory-multiplier">1.0x</span></p>
+        <p id="victory-romance" class="romance-ending"></p>
+      </div>
+
+      <div class="end-buttons">
+        <button id="victory-leaderboard-btn" class="btn-primary">View Leaderboard</button>
+        <button id="victory-menu-btn" class="btn-secondary">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SCRIPTS
+       Loaded at the bottom of <body> so all the HTML elements
+       exist before the scripts run.
+
+       Order matters:
+         data.js        → characters and questions
+         storage.js     → localStorage helpers
+         auth.js        → login/logout (used by app.js)
+         leaderboard.js → rendering the top 10
+         game.js        → gameplay loop
+         app.js         → wires everything together
+       ============================================================ -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
